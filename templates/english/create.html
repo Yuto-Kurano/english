@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel = "stylesheet"
+    href = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    crossorigin = "anonymous">
+    <link rel = "stylesheet" href = "{% static 'english/css/style.css' %}">
+</head>
+<body class = "container-large">
+    <h1 class = "text-black">{{title}}</h1>
+    <form action = "{% url 'create' request.user.pk %}" method = "post">
+        {% csrf_token %}
+        <tr>{{msg}}</tr>
+        {{ form.as_p }}
+        <p>自動で意味を検出して追加します</p>
+        <p><input type = "submit" value ="追加" class = "btn btn-dark text-primary btn-lg" role = 'button'></p>
+        <a class = "btn btn-dark btn-lg" href = "{% url goto request.user.pk %}">戻る</a>
+    </form>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel = "stylesheet"
+    href = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    crossorigin = "anonymous">
+    <link rel = "stylesheet" href = "{% static 'english/css/style.css' %}">
+</head>
+<body class = "container-fluid">
+    <h1 class = "text-black">{{title}}</h1>
+    <p>削除します</p>
+    <table class = "table">
+        <tr><th>word</th><td>{{obj.word}}</td></tr>
+        <tr><th>meaning</th><td>{{obj.meaning}}</td></tr>
+        <form acton = "{% url 'delete' id request.user.pk %}" method = "post">
+            {% csrf_token %}
+            <tr><th></th><td>
+                <input type = "submit" value = "削除" class = "btn btn-dark btn-lg">
+                <a class = "btn btn-dark btn-lg" href = "{% url goto request.user.pk %}">戻る</a>
+            </td></tr>
+        </form>
+    </table>
+</body>
+</html>

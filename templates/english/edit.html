@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel = "stylesheet"
+    href = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    crossorigin = "anonymous">
+    <link rel = "stylesheet" href = "{% static 'english/css/style.css' %}">
+</head>
+<body class = "container-large">
+    <h1 class = "text-black">{{title}}</h1>
+    <table class = "table">
+        <form action = "{% url 'edit' id request.user.pk %}" method = "post">
+            {% csrf_token %}
+            <p>{{form}}</p>
+            <tr><th>単語</th><td>{{obj.word}}</td></tr>
+            <tr><th>編集前の意味</th><td>{{obj.meaning}}</td></tr>
+            <p>編集画面です</p>
+            <p><input type = "submit" value ="完了" class = "btn btn-dark text-white btn-lg" role = 'button'></p>
+        </form>
+    </table>
+</body>
+</html>

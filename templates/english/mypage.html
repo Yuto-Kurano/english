@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel = "stylesheet"
+        href = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    crossorigin = "anonymous">
+    <link rel = "stylesheet" href = "{% static 'english/css/style.css' %}">
+</head>
+<body class = "container-fluid">
+    <h1 class = "text-black">{{title}}</h1>
+    <h3 class = "text-black">ようこそ{{user}}さん!</h3>
+        <table class = "table  text-black">
+            <tr>
+                <th>単語</th>
+                <th>意味</th>
+            </tr>
+        {% for item in data %}
+        {% if user.is_authenticated %}
+            <tr>
+                <td>{{item.word}}</td>
+                <td>{{item.meaning}}</td>
+                <td><a class = "btn btn-dark btn-lg" href = "{% url 'delete' item.id request.user.pk %}" role = 'button'>削除</a></td>
+                <td><a class = "btn btn-dark btn-lg" href = "{% url 'edit' item.id request.user.pk %}" role = 'button'>編集</a></td>
+            </tr>
+        {% endif %}
+        {% endfor %}
+        <a class = "btn btn-dark btn-lg" href = "{% url goto request.user.pk %}" role = 'button'>追加</a>
+        </table>
+</body>
+</html>
