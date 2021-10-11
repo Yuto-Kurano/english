@@ -5,7 +5,7 @@ from .models import Words
 from django.shortcuts import redirect
 import requests
 from bs4 import BeautifulSoup
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 def index(request):#紹介ページ
     params = {
@@ -52,6 +52,28 @@ def signin(request):#サインイン処理
             params['msg'] = 'usernameかpasswordが間違っています'
             form = SignInForm()
     return render(request, 'english/signin.html', params)
+
+def signout(request, pk):
+    if (request.method == 'POST'):
+        logout(request)
+        return redirect(to = 'index')
+    params = {
+        'title' : 'サインアウト',
+        'msg' : 'サインアウトしますか？',
+    }
+    return render(request, 'english/signout.html', params)
+
+def user_delete(request, pk):
+    user = request.user
+    if (request.method == 'POST'):
+        user.delete()
+        return redirect(to = 'index')
+    params = {
+        'title' : 'アカウント消去',
+        'msg' : '本当に削除しますか？'
+    }
+    return render(request, 'english/user_delete.html', params)
+
 
 def mypage(request, pk):#個人ページ
     data = Words.objects.filter(user = request.user)#ログインユーザーのデータを抽出
@@ -133,13 +155,13 @@ def edit(request, num, pk):#単語編集
     return render(request, 'english/edit.html', params)
 
 def search(request, pk):#単語検索
-    user = request.user
     params = {
         'title' : '検索',
         'form' : CreateForm(),
         'goto' : 'mypage',
         'msg' : '単語を入力してください',
         'meaning' : '',
+        'img' : '',
     }
     if(request.method == 'POST'):
         word = request.POST['word']

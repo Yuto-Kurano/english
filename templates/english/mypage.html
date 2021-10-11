@@ -30,6 +30,8 @@
         <a class = "btn btn-dark btn-lg" href = "{% url goto request.user.pk %}" role = 'button'>追加(自動)</a>
         <a class = "btn btn-dark btn-lg" href = "{% url 'create_myself' request.user.pk %}" role = 'button'>追加(手動)</a>
         <a class = "btn btn-dark btn-lg" href = "{% url 'search' request.user.pk %}" role = 'button'>検索</a>
+        <a class = "btn btn-dark btn-lg" href = "{% url 'signout' request.user.pk %}" role = 'button'>サインアウト</a>
+        <a class = "btn btn-dark text-danger btn-lg" href = "{% url 'user_delete' request.user.pk %}" role = 'button'>アカウント削除</a>
         </table>
 </body>
 </html>
