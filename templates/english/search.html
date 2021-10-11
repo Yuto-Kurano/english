@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel = "stylesheet"
+    href = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    crossorigin = "anonymous">
+    <link rel = "stylesheet" href = "{% static 'english/css/style.css' %}">
+</head>
+<body class = "container-large">
+    <h1 class = "text-black">{{title}}</h1>
+    <form action = "{% url 'search' request.user.pk %}" method = "post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {{meaning}}
+        <tr>{{msg}}</tr>
+        <p>自動で意味を検出します</p>
+        <p><input type = "submit" value ="検索" class = "btn btn-dark text-white btn-lg" role = 'button'></p>
+        <a class = "btn btn-dark btn-lg" href = "{% url goto request.user.pk %}">戻る</a>
+    </form>
+</body>
+</html>

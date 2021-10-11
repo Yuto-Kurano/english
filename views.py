@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .forms import SignUpForm, CreateForm, SignInForm, EditForm
+from .forms import SignUpForm, CreateForm, SignInForm, EditForm, Create_myselfForm
 from .models import Words
 from django.shortcuts import redirect
 import requests
 from bs4 import BeautifulSoup
 from django.contrib.auth import authenticate, login
 
-def index(request):
+def index(request):#紹介ページ
     params = {
         'title' : '英単語アプリへようこそ!',
         'goto' : 'new',
@@ -85,6 +85,23 @@ def create(request, pk):#単語追加
             params['msg'] = 'It does not exist'
     return render(request, 'english/create.html', params)
 
+def create_myself(request, pk):#単語と意味を手動で記録
+    user = request.user
+    params = {
+        'title' : '単語追加',
+        'form' : Create_myselfForm(),
+        'goto' : 'mypage',
+        'msg' : '単語を入力してください'
+    }
+    if(request.method == 'POST'):
+        word = request.POST['word']
+        meaning = request.POST['meaning']
+        words = Words(word = word, meaning = meaning, user = user)
+        words.save()
+        return redirect(to = 'mypage', pk = user.pk)
+    return render(request, 'english/create_myself.html', params)
+
+
 def delete(request, num, pk):#単語削除
     user = request.user
     words = Words.objects.get(id = num)
@@ -99,7 +116,7 @@ def delete(request, num, pk):#単語削除
     }
     return render(request, 'english/delete.html', params)
 
-def edit(request, num, pk):
+def edit(request, num, pk):#単語編集
     user = request.user
     obj = Words.objects.get(id = num)
     if(request.method == 'POST'):
@@ -114,3 +131,28 @@ def edit(request, num, pk):
         'obj' : obj,
     }
     return render(request, 'english/edit.html', params)
+
+def search(request, pk):#単語検索
+    user = request.user
+    params = {
+        'title' : '検索',
+        'form' : CreateForm(),
+        'goto' : 'mypage',
+        'msg' : '単語を入力してください',
+        'meaning' : '',
+    }
+    if(request.method == 'POST'):
+        word = request.POST['word']
+        try:#日本語入力時
+            url = 'https://ejje.weblio.jp/content/' + word
+            html = requests.get(url)
+            soup = BeautifulSoup(html.content, "html.parser")
+            meaning = soup.find(class_ = "content-explanation je").text
+            params['msg'] = meaning
+        except:#英語入力時
+            url = 'https://ejje.weblio.jp/content/' + word
+            html = requests.get(url)
+            soup = BeautifulSoup(html.content, "html.parser")
+            meaning = soup.find(class_ = "content-explanation ej").text
+            params['msg'] = meaning
+    return render(request, 'english/search.html', params)

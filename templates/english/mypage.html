@@ -27,7 +27,9 @@
             </tr>
         {% endif %}
         {% endfor %}
-        <a class = "btn btn-dark btn-lg" href = "{% url goto request.user.pk %}" role = 'button'>追加</a>
+        <a class = "btn btn-dark btn-lg" href = "{% url goto request.user.pk %}" role = 'button'>追加(自動)</a>
+        <a class = "btn btn-dark btn-lg" href = "{% url 'create_myself' request.user.pk %}" role = 'button'>追加(手動)</a>
+        <a class = "btn btn-dark btn-lg" href = "{% url 'search' request.user.pk %}" role = 'button'>検索</a>
         </table>
 </body>
 </html>

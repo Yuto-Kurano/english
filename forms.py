@@ -24,6 +24,13 @@ class SignInForm(AuthenticationForm):
 class CreateForm(forms.Form):
     word = forms.CharField(label = 'word', \
         widget = forms.TextInput(attrs = {'class' : 'form control'}))
+
+class Create_myselfForm(forms.Form):
+    word = forms.CharField(label = 'word', \
+        widget = forms.TextInput(attrs = {'class' : 'form control'}))
+    meaning = forms.CharField(label = 'meaning', \
+        widget = forms.TextInput(attrs = {'class' : 'form control'}))
+
         
 class EditForm(forms.ModelForm):
     class Meta:
