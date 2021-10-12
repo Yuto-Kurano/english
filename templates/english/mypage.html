@@ -12,6 +12,8 @@
 <body class = "container-fluid">
     <h1 class = "text-black">{{title}}</h1>
     <h3 class = "text-black">ようこそ{{user}}さん!</h3>
+    <h3><a class = "btn btn-dark btn-lg" href = "{% url 'signout' request.user.pk %}" role = 'button'>サインアウト</a>
+        <a class = "btn btn-dark text-danger btn-lg" href = "{% url 'user_delete' request.user.pk %}" role = 'button'>アカウント削除</a></h3>
         <table class = "table  text-black">
             <tr>
                 <th>単語</th>
@@ -30,8 +32,6 @@
         <a class = "btn btn-dark btn-lg" href = "{% url goto request.user.pk %}" role = 'button'>追加(自動)</a>
         <a class = "btn btn-dark btn-lg" href = "{% url 'create_myself' request.user.pk %}" role = 'button'>追加(手動)</a>
         <a class = "btn btn-dark btn-lg" href = "{% url 'search' request.user.pk %}" role = 'button'>検索</a>
-        <a class = "btn btn-dark btn-lg" href = "{% url 'signout' request.user.pk %}" role = 'button'>サインアウト</a>
-        <a class = "btn btn-dark text-danger btn-lg" href = "{% url 'user_delete' request.user.pk %}" role = 'button'>アカウント削除</a>
         </table>
 </body>
 </html>

@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from .forms import SignUpForm, CreateForm, SignInForm, EditForm, Create_myselfForm
 from .models import Words
 from django.shortcuts import redirect
-import requests
+import requests, urllib
 from bs4 import BeautifulSoup
 from django.contrib.auth import authenticate, login, logout
 
@@ -65,7 +65,9 @@ def signout(request, pk):
 
 def user_delete(request, pk):
     user = request.user
+    data = Words.objects.filter(user = request.user)
     if (request.method == 'POST'):
+        data.delete()
         user.delete()
         return redirect(to = 'index')
     params = {
@@ -161,7 +163,7 @@ def search(request, pk):#単語検索
         'goto' : 'mypage',
         'msg' : '単語を入力してください',
         'meaning' : '',
-        'img' : '',
+        'img_select' : '',
     }
     if(request.method == 'POST'):
         word = request.POST['word']
@@ -171,10 +173,16 @@ def search(request, pk):#単語検索
             soup = BeautifulSoup(html.content, "html.parser")
             meaning = soup.find(class_ = "content-explanation je").text
             params['msg'] = meaning
-        except:#英語入力時
+        except:#英語入力時、2がミス
             url = 'https://ejje.weblio.jp/content/' + word
-            html = requests.get(url)
-            soup = BeautifulSoup(html.content, "html.parser")
-            meaning = soup.find(class_ = "content-explanation ej").text
+            load_url = 'https://pixabay.com/ja/images/search/' + word + '/'
+            html_1 = requests.get(url)
+            soup_1 = BeautifulSoup(html_1.content, "html.parser")
+            meaning = soup_1.find(class_ = "content-explanation ej").text
             params['msg'] = meaning
+            html_2 = requests.get(load_url)
+            soup_2 = BeautifulSoup(html_2.content, "html.parser")
+            img = soup_2.find(class_ = 'link--h3bPW')
+            for element in img.find_all("img"):
+                print(element.img)
     return render(request, 'english/search.html', params)
