@@ -163,7 +163,6 @@ def search(request, pk):#単語検索
         'goto' : 'mypage',
         'msg' : '単語を入力してください',
         'meaning' : '',
-        'img_select' : '',
     }
     if(request.method == 'POST'):
         word = request.POST['word']
@@ -175,14 +174,8 @@ def search(request, pk):#単語検索
             params['msg'] = meaning
         except:#英語入力時、2がミス
             url = 'https://ejje.weblio.jp/content/' + word
-            load_url = 'https://pixabay.com/ja/images/search/' + word + '/'
-            html_1 = requests.get(url)
-            soup_1 = BeautifulSoup(html_1.content, "html.parser")
-            meaning = soup_1.find(class_ = "content-explanation ej").text
+            html = requests.get(url)
+            soup = BeautifulSoup(html.content, "html.parser")
+            meaning = soup.find(class_ = "content-explanation ej").text
             params['msg'] = meaning
-            html_2 = requests.get(load_url)
-            soup_2 = BeautifulSoup(html_2.content, "html.parser")
-            img = soup_2.find(class_ = 'link--h3bPW')
-            for element in img.find_all("img"):
-                print(element.img)
     return render(request, 'english/search.html', params)
