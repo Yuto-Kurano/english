@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Words
+from .models import Words, Sentence
 
 
 class SignUpForm(UserCreationForm):
@@ -36,3 +36,10 @@ class EditForm(forms.ModelForm):
     class Meta:
         model = Words
         fields = ['meaning']
+
+class CountForm(forms.Form):
+    sentence = forms.CharField(label = 'sentence', \
+        widget = forms.TextInput(attrs = {'class' : 'form control'}))
+    class Meta:
+        model = Sentence
+        field = ['sentence']

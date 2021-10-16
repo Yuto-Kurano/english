@@ -5,6 +5,5 @@ class Words(models.Model):
     meaning = models.CharField(max_length = 100)
     user = models.CharField(max_length = 100)
 
-        
-
-        
+class Sentence(models.Model):
+    sentence = models.CharField(max_length = 1000)

@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel = "stylesheet"
+        href = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    crossorigin = "anonymous">
+    <link rel = "stylesheet" href = "{% static 'english/css/style.css' %}">
+</head>
+<body class = "container-fluid">
+    <h1 class = "text-black">{{title}}</h1>
+    <h3 class = "text-black">ようこそ{{user}}さん!</h3>
+    <form action = "{% url 'count' request.user.pk %}" method = "post">
+        {% csrf_token %}
+        <p>{{form}}</p>
+            <img src= "{% static 'english/png/count.png' %}" width="500" height="500">
+        {{ endif }}
+        <p><input type = "submit" value ="完了" class = "btn btn-dark text-white btn-lg" role = 'button'></p>
+        <a class = "btn btn-dark btn-lg" href = "{% url 'mypage' request.user.pk %}">戻る</a>
+</body>
+</html>

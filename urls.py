@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django_app import settings
+
 
 urlpatterns = [
     path('', views.index, name = 'index'),
@@ -12,5 +14,6 @@ urlpatterns = [
     path('edit/<int:num>/<int:pk>', views.edit, name = 'edit'),  
     path('search/<int:pk>', views.search, name = 'search'),
     path('signout/<int:pk>', views.signout, name = 'signout'),
-    path('user_delete/<int:pk>', views.user_delete, name = 'user_delete')
+    path('user_delete/<int:pk>', views.user_delete, name = 'user_delete'),
+    path('count/<int:pk>', views.count, name = 'count'),
 ]

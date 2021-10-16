@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .forms import SignUpForm, CreateForm, SignInForm, EditForm, Create_myselfForm
-from .models import Words
+from .forms import SignUpForm, CreateForm, SignInForm, EditForm, Create_myselfForm, CountForm
+from .models import Words, Sentence
 from django.shortcuts import redirect
-import requests, urllib
+import requests, collections, matplotlib.pyplot as plt, seaborn as sns
 from bs4 import BeautifulSoup
 from django.contrib.auth import authenticate, login, logout
 
@@ -172,10 +172,31 @@ def search(request, pk):#単語検索
             soup = BeautifulSoup(html.content, "html.parser")
             meaning = soup.find(class_ = "content-explanation je").text
             params['msg'] = meaning
-        except:#英語入力時、2がミス
+        except:#英語入力時
             url = 'https://ejje.weblio.jp/content/' + word
             html = requests.get(url)
             soup = BeautifulSoup(html.content, "html.parser")
             meaning = soup.find(class_ = "content-explanation ej").text
             params['msg'] = meaning
     return render(request, 'english/search.html', params)
+
+def count(request, pk):#単語の使用頻度チェック
+    params = {
+        'title' : '単語頻度チェック',
+        'form' : CountForm(),
+    }
+    if (request.method == 'POST'):
+        form = CountForm(request.POST)
+        count = request.POST['sentence']
+        count = count.lower()
+        count = count.replace(".", "")
+        sentence = count.replace(",", "")
+        word = sentence.split()
+        collect = collections.Counter(word)
+        popular = collect.most_common(20)
+        sns.set(context = "talk")
+        fig = plt.subplots(figsize = (8,8))
+        sns.countplot(y = word, order = [i[0] for i in collect.most_common(20)])
+        filename = 'english/static/english/png/' + 'count.png'#フォルダ指定
+        plt.savefig(filename)
+    return render(request, 'english/count.html', params)
