@@ -16,4 +16,5 @@ urlpatterns = [
     path('signout/<int:pk>', views.signout, name = 'signout'),
     path('user_delete/<int:pk>', views.user_delete, name = 'user_delete'),
     path('count/<int:pk>', views.count, name = 'count'),
+    path('twitter/<int:pk>', views.twitter, name = 'twitter'),
 ]

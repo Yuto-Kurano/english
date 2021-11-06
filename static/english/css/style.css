@@ -11,3 +11,8 @@ h1{
 h3{
     font-weight : bolder;
 }
+
+
+form{
+    width: 500px;
+}

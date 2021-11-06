@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel = "stylesheet"
+    href = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    crossorigin = "anonymous">
+    <link rel = "stylesheet" href = "{% static 'english/css/style.css' %}">
+</head>
+<body class = "container-large">
+    <h1 class = "text-black">{{title}}</h1>
+    <table class = "table">
+        <form action = "{% url 'twitter' request.user.pk %}" method = "post">
+            {% csrf_token %}
+            <p>{{a}}</p>
+            <p>{{p}}</p>
+            <img src= "{% static 'english/png/count_twitter.png' %}" width="500" height="500">
+            <p><a class = "btn btn-dark btn-lg" href = "{% url 'mypage' request.user.pk %}">戻る</a></p>
+        </form>
+    </table>
+</body>
+</html>

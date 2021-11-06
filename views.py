@@ -3,9 +3,10 @@ from django.http import HttpResponse
 from .forms import SignUpForm, CreateForm, SignInForm, EditForm, Create_myselfForm, CountForm
 from .models import Words, Sentence
 from django.shortcuts import redirect
-import requests, collections, matplotlib.pyplot as plt, seaborn as sns
+import requests, collections, matplotlib.pyplot as plt, seaborn as sns, tweepy, itertools
 from bs4 import BeautifulSoup
 from django.contrib.auth import authenticate, login, logout
+from django_app.settings import secret1, secret2, secret3, secret4
 
 def index(request):#紹介ページ
     params = {
@@ -163,6 +164,7 @@ def search(request, pk):#単語検索
         'goto' : 'mypage',
         'msg' : '単語を入力してください',
         'meaning' : '',
+        'origin' : '',
     }
     if(request.method == 'POST'):
         word = request.POST['word']
@@ -191,12 +193,43 @@ def count(request, pk):#単語の使用頻度チェック
         count = count.lower()
         count = count.replace(".", "")
         sentence = count.replace(",", "")
-        word = sentence.split()
-        collect = collections.Counter(word)
-        popular = collect.most_common(20)
-        sns.set(context = "talk")
+        word = sentence.split()#スペースで分割
+        collect = collections.Counter(word)#単語の数の計測
+        popular = collect.most_common(20)#使用頻度上位20個抽出
+        sns.set(context = "talk")#横棒グラフ
         fig = plt.subplots(figsize = (8,8))
-        sns.countplot(y = word, order = [i[0] for i in collect.most_common(20)])
-        filename = 'english/static/english/png/' + 'count.png'#フォルダ指定
+        sns.countplot(y = word, order = [i[0] for i in popular])#グラフ作成
+        filename = 'english/static/english/png/count.png'#フォルダ指定
         plt.savefig(filename)
     return render(request, 'english/count.html', params)
+
+def twitter(request, pk):
+    params = {
+        'a' : '',
+        'p' : '',
+    }
+    comsumer_key = secret1
+    comsumer_secret = secret2
+    access_token = secret3
+    access_token_secret = secret4
+    auth = tweepy.OAuthHandler(comsumer_key, comsumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tweepy.API(auth)
+    account = "dAp0IrD3VltQfP9"
+    tweets = api.user_timeline(account = account, count = 100, tweet_mode = "extended")
+    word_list = []#単語の格納先
+    for tweet in tweets:
+        count = str(tweet.full_text.lower()).replace(",", "")
+        count = count.replace(".", "")
+        word = count.split()
+        word_list.append(word)#リストaに格納
+    change = itertools.chain.from_iterable(word_list)#一次元配列に変換
+    words = list(change)#y軸に入れられるように統一
+    collect = collections.Counter(words)#単語の数の計測
+    popular = collect.most_common(20)#使用頻度上位20個抽出
+    sns.set(context = "talk")#横棒グラフ
+    fig = plt.subplots(figsize = (8,8))
+    sns.countplot(y = words, order = [i[0] for i in popular])#グラフ作成
+    filename = 'english/static/english/png/count_twitter.png'#フォルダ指定
+    plt.savefig(filename)    
+    return render(request, 'english/twitter.html', params)
