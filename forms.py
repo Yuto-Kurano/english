@@ -30,7 +30,6 @@ class Create_myselfForm(forms.Form):
         widget = forms.TextInput(attrs = {'class' : 'form-control'}))
     meaning = forms.CharField(label = 'meaning', \
         widget = forms.TextInput(attrs = {'class' : 'form-control'}))
-
         
 class EditForm(forms.ModelForm):
     class Meta:
@@ -39,7 +38,11 @@ class EditForm(forms.ModelForm):
 
 class CountForm(forms.Form):
     sentence = forms.CharField(label = 'sentence', \
-        widget = forms.TextInput(attrs = {'class' : 'form-control', 'cols': '100'}))
+        widget = forms.TextInput(attrs = {'class' : 'form-control'}))
     class Meta:
         model = Sentence
         field = ['sentence']
+
+class TwitterForm(forms.Form):
+    account = forms.CharField(label = 'account', \
+        widget = forms.TextInput(attrs = {'class' : 'form-control'}))

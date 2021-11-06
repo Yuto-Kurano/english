@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .forms import SignUpForm, CreateForm, SignInForm, EditForm, Create_myselfForm, CountForm
+from .forms import SignUpForm, CreateForm, SignInForm, EditForm, Create_myselfForm, CountForm, TwitterForm
 from .models import Words, Sentence
 from django.shortcuts import redirect
 import requests, collections, matplotlib.pyplot as plt, seaborn as sns, tweepy, itertools
 from bs4 import BeautifulSoup
 from django.contrib.auth import authenticate, login, logout
-from django_app.settings import secret1, secret2, secret3, secret4
+from .secret_api import secret1, secret2, secret3, secret4
 
 def index(request):#紹介ページ
     params = {
@@ -168,18 +168,21 @@ def search(request, pk):#単語検索
     }
     if(request.method == 'POST'):
         word = request.POST['word']
-        try:#日本語入力時
-            url = 'https://ejje.weblio.jp/content/' + word
-            html = requests.get(url)
-            soup = BeautifulSoup(html.content, "html.parser")
-            meaning = soup.find(class_ = "content-explanation je").text
-            params['msg'] = meaning
-        except:#英語入力時
-            url = 'https://ejje.weblio.jp/content/' + word
-            html = requests.get(url)
-            soup = BeautifulSoup(html.content, "html.parser")
-            meaning = soup.find(class_ = "content-explanation ej").text
-            params['msg'] = meaning
+        try:
+            try:#日本語入力時
+                url = 'https://ejje.weblio.jp/content/' + word
+                html = requests.get(url)
+                soup = BeautifulSoup(html.content, "html.parser")
+                meaning = soup.find(class_ = "content-explanation je").text
+                params['msg'] = meaning
+            except:#英語入力時
+                url = 'https://ejje.weblio.jp/content/' + word
+                html = requests.get(url)
+                soup = BeautifulSoup(html.content, "html.parser")
+                meaning = soup.find(class_ = "content-explanation ej").text
+                params['msg'] = meaning
+        except AttributeError:
+            params['msg'] = "検出できませんでした"
     return render(request, 'english/search.html', params)
 
 def count(request, pk):#単語の使用頻度チェック
@@ -205,8 +208,8 @@ def count(request, pk):#単語の使用頻度チェック
 
 def twitter(request, pk):
     params = {
-        'a' : '',
-        'p' : '',
+        'form' : TwitterForm(),
+        'msg' : '@から始まるアカウント名を入力してください'
     }
     comsumer_key = secret1
     comsumer_secret = secret2
@@ -215,21 +218,25 @@ def twitter(request, pk):
     auth = tweepy.OAuthHandler(comsumer_key, comsumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
-    account = "dAp0IrD3VltQfP9"
-    tweets = api.user_timeline(account = account, count = 100, tweet_mode = "extended")
-    word_list = []#単語の格納先
-    for tweet in tweets:
-        count = str(tweet.full_text.lower()).replace(",", "")
-        count = count.replace(".", "")
-        word = count.split()
-        word_list.append(word)#リストaに格納
-    change = itertools.chain.from_iterable(word_list)#一次元配列に変換
-    words = list(change)#y軸に入れられるように統一
-    collect = collections.Counter(words)#単語の数の計測
-    popular = collect.most_common(20)#使用頻度上位20個抽出
-    sns.set(context = "talk")#横棒グラフ
-    fig = plt.subplots(figsize = (8,8))
-    sns.countplot(y = words, order = [i[0] for i in popular])#グラフ作成
-    filename = 'english/static/english/png/count_twitter.png'#フォルダ指定
-    plt.savefig(filename)    
+    if (request.method == 'POST'):#後でtry
+        form = TwitterForm(request.POST)
+        try:
+            tweets = api.user_timeline(account = form, count = 100, tweet_mode = "extended")
+            word_list = []#単語の格納先
+            for tweet in tweets:
+                count = str(tweet.full_text.lower()).replace(",", "")
+                count = count.replace(".", "")
+                word = count.split()
+                word_list.append(word)#リストaに格納
+            change = itertools.chain.from_iterable(word_list)#一次元配列に変換
+            words = list(change)#y軸に入れられるように統一
+            collect = collections.Counter(words)#単語の数の計測
+            popular = collect.most_common(20)#使用頻度上位20個抽出
+            sns.set(context = "talk")#横棒グラフ
+            fig = plt.subplots(figsize = (8,8))
+            sns.countplot(y = words, order = [i[0] for i in popular])#グラフ作成
+            filename = 'english/static/english/png/count_twitter.png'#フォルダ指定
+            plt.savefig(filename)    
+        except:
+            params['msg'] = 'このアカウントは存在しないかご利用いただけません'
     return render(request, 'english/twitter.html', params)
