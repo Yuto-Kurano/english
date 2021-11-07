@@ -22,13 +22,13 @@ class SignInForm(AuthenticationForm):
         )
 
 class CreateForm(forms.Form):
-    word = forms.CharField(label = 'word', \
+    word = forms.CharField(label = '英単語', \
         widget = forms.TextInput(attrs = {'class' : 'form-control'}))
 
 class Create_myselfForm(forms.Form):
-    word = forms.CharField(label = 'word', \
+    word = forms.CharField(label = '英単語', \
         widget = forms.TextInput(attrs = {'class' : 'form-control'}))
-    meaning = forms.CharField(label = 'meaning', \
+    meaning = forms.CharField(label = '意味', \
         widget = forms.TextInput(attrs = {'class' : 'form-control'}))
         
 class EditForm(forms.ModelForm):
@@ -37,12 +37,12 @@ class EditForm(forms.ModelForm):
         fields = ['meaning']
 
 class CountForm(forms.Form):
-    sentence = forms.CharField(label = 'sentence', \
+    sentence = forms.CharField(label = '英文', \
         widget = forms.TextInput(attrs = {'class' : 'form-control'}))
     class Meta:
         model = Sentence
         field = ['sentence']
 
 class TwitterForm(forms.Form):
-    account = forms.CharField(label = 'account', \
+    screen_name = forms.CharField(label = 'ユーザー名', \
         widget = forms.TextInput(attrs = {'class' : 'form-control'}))

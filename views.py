@@ -173,15 +173,15 @@ def search(request, pk):#単語検索
                 url = 'https://ejje.weblio.jp/content/' + word
                 html = requests.get(url)
                 soup = BeautifulSoup(html.content, "html.parser")
-                meaning = soup.find(class_ = "content-explanation je").text
+                meaning = soup.find(class_ = "content-explanation je").text#情報の取得
                 params['msg'] = meaning
             except:#英語入力時
                 url = 'https://ejje.weblio.jp/content/' + word
                 html = requests.get(url)
                 soup = BeautifulSoup(html.content, "html.parser")
-                meaning = soup.find(class_ = "content-explanation ej").text
+                meaning = soup.find(class_ = "content-explanation ej").text#情報の取得
                 params['msg'] = meaning
-        except AttributeError:
+        except AttributeError:#スペルミスなどの場合
             params['msg'] = "検出できませんでした"
     return render(request, 'english/search.html', params)
 
@@ -209,7 +209,9 @@ def count(request, pk):#単語の使用頻度チェック
 def twitter(request, pk):
     params = {
         'form' : TwitterForm(),
-        'msg' : '@から始まるアカウント名を入力してください'
+        'msg' : '@から始まるアカウント名を入力してください',
+        'danger' : '画面が切り替わらない場合はリロードしてください',
+        'a' : '',
     }
     comsumer_key = secret1
     comsumer_secret = secret2
@@ -218,12 +220,13 @@ def twitter(request, pk):
     auth = tweepy.OAuthHandler(comsumer_key, comsumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
-    if (request.method == 'POST'):#後でtry
-        form = TwitterForm(request.POST)
+    if (request.method == 'POST'):
+        screen_name = request.POST['screen_name']
         try:
-            tweets = api.user_timeline(account = form, count = 100, tweet_mode = "extended")
+            tweets = api.user_timeline(screen_name = screen_name, count = 14, tweet_mode = "extended")
             word_list = []#単語の格納先
             for tweet in tweets:
+                params['a'] = tweet.user.screen_name
                 count = str(tweet.full_text.lower()).replace(",", "")
                 count = count.replace(".", "")
                 word = count.split()
@@ -240,3 +243,4 @@ def twitter(request, pk):
         except:
             params['msg'] = 'このアカウントは存在しないかご利用いただけません'
     return render(request, 'english/twitter.html', params)
+

@@ -11,14 +11,15 @@
 </head>
 <body class = "container-large">
     <h1 class = "text-black">{{title}}</h1>
-    <table class = "table">
-        <form action = "{% url 'twitter' request.user.pk %}" method = "post">
+    <form action = "{% url 'twitter' request.user.pk %}" method = "post">
             {% csrf_token %}
+            <p>{{msg}}</p>
+            <p>{{danger}}</p>
             <p>{{a}}</p>
-            <p>{{p}}</p>
-            <img src= "{% static 'english/png/count_twitter.png' %}" width="500" height="500">
+            {{form.as_p}}
+            <p><input type = "submit" value ="click" class = "btn btn-dark btn-lg"></p>
             <p><a class = "btn btn-dark btn-lg" href = "{% url 'mypage' request.user.pk %}">戻る</a></p>
-        </form>
-    </table>
+            <p><img src= "{% static 'english/png/count_twitter.png' %}" width="500" height="500"></p>
+    </form>
 </body>
 </html>
