@@ -229,15 +229,30 @@ def twitter(request, pk):
                 params['a'] = tweet.user.screen_name
                 count = str(tweet.full_text.lower()).replace(",", "")
                 count = count.replace(".", "")
+                count = count.replace("!", "")
+                count = count.replace("?", "")
                 word = count.split()
                 word_list.append(word)#リストaに格納
             change = itertools.chain.from_iterable(word_list)#一次元配列に変換
             words = list(change)#y軸に入れられるように統一
-            collect = collections.Counter(words)#単語の数の計測
+            new_word_list = []
+            #以下、主語→動詞→前置詞→接続詞→冠詞→否定+省略語の順で汎用度の高い単語を記述
+            emit_words = ["i", "you", "we", "he", "she", "they", "it", "this", "that",\
+                        "am", "is", "are", "was", "were", "does", "did", "do",\
+                        "at", "on", "in", "for", "to", "into", "of", "out", "as", "from", "with",\
+                        "and", "or",\
+                        "a", "an", "the",\
+                        "not", "ain't", "aren't", "isn't", "wasn't", "weren't",\
+                        "don't", "doesn't", "didn't", "haven't", "hasn't", "hadn't",\
+                        "i'm", "you're", "he's", "she's", "they're", "it's", "that's"]
+            for sort_word in words:
+                if (sort_word in emit_words) == False:
+                    new_word_list.append(sort_word)
+            collect = collections.Counter(new_word_list)#単語の数の計測
             popular = collect.most_common(20)#使用頻度上位20個抽出
             sns.set(context = "talk")#横棒グラフ
-            fig = plt.subplots(figsize = (8,8))
-            sns.countplot(y = words, order = [i[0] for i in popular])#グラフ作成
+            fig = plt.subplots(figsize = (12,12))
+            sns.countplot(y = new_word_list, order = [i[0] for i in popular])#グラフ作成
             filename = 'english/static/english/png/count_twitter.png'#フォルダ指定
             plt.savefig(filename)    
         except:
