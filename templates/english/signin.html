@@ -15,7 +15,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <p>{{msg}}</p>
-        <input type = "submit" value ="click" class = "btn btn-dark btn-lg">
+        <input type = "submit" value ="完了" class = "btn btn-dark btn-lg">
     </form>
     <a class = "btn btn-dark btn-lg" href = "{% url 'index' %}">戻る</a>
 </body>

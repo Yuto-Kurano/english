@@ -14,7 +14,11 @@
     <form action = "{% url 'count' request.user.pk %}" method = "post">
         {% csrf_token %}
         <p>{{form}}</p>
-        <img src= "{% static 'english/png/count.png' %}" width="500" height="500">
+        <p>{{msg}}</p>
+        <p>{{image}}</p>
+        {% if request.method == "POST" %}
+            <img src= "{% static 'english/png/count.png' %}" width="500" height="500">
+        {% endif %}
         <p><input type = "submit" value ="完了" class = "btn btn-dark text-white btn-lg" role = 'button' ></p>
         <a class = "btn btn-dark btn-lg" href = "{% url 'mypage' request.user.pk %}">戻る</a>
     </form>

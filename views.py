@@ -107,7 +107,7 @@ def create(request, pk):#単語追加
             words.save()
             return redirect(to = 'mypage', pk = user.pk)
         except:#例外処理(英単語が存在しなかった場合)
-            params['msg'] = 'It does not exist'
+            params['msg'] = '検索できませんでした'
     return render(request, 'english/create.html', params)
 
 def create_myself(request, pk):#単語と意味を手動で記録
@@ -182,28 +182,43 @@ def search(request, pk):#単語検索
                 meaning = soup.find(class_ = "content-explanation ej").text#情報の取得
                 params['msg'] = meaning
         except AttributeError:#スペルミスなどの場合
-            params['msg'] = "検出できませんでした"
+            params['msg'] = "検策できませんでした"
     return render(request, 'english/search.html', params)
 
 def count(request, pk):#単語の使用頻度チェック
     params = {
         'title' : '単語頻度チェック',
         'form' : CountForm(),
+        'msg' : '',
+        'image' : '',
     }
-    if (request.method == 'POST'):
-        form = CountForm(request.POST)
-        count = request.POST['sentence']
-        count = count.lower()
-        count = count.replace(".", "")
-        sentence = count.replace(",", "")
-        word = sentence.split()#スペースで分割
-        collect = collections.Counter(word)#単語の数の計測
-        popular = collect.most_common(20)#使用頻度上位20個抽出
-        sns.set(context = "talk")#横棒グラフ
-        fig = plt.subplots(figsize = (8,8))
-        sns.countplot(y = word, order = [i[0] for i in popular])#グラフ作成
-        filename = 'english/static/english/png/count.png'#フォルダ指定
-        plt.savefig(filename)
+    word_list = []
+    try:
+        if (request.method == 'POST'):
+            form = CountForm(request.POST)
+            count = request.POST['sentence']
+            count = count.lower()
+            count = count.replace(".", "")
+            sentence = count.replace(",", "")
+            word_list.append(sentence.split())#スペースで分割
+            change = itertools.chain.from_iterable(word_list)#一次元配列に変換
+            words = list(change)#y軸に入れられるように統一
+            second_word_list = []
+            emit_words = [
+                "a", "an", "the",
+            ]
+            for sort_word in words:
+                if (sort_word in emit_words) == False:#emit_wordsに記載の単語を排除
+                    second_word_list.append(sort_word)
+            collect = collections.Counter(second_word_list)#単語の数の計測
+            popular = collect.most_common(20)#使用頻度上位20個抽出
+            sns.set(context = "talk")#横棒グラフ
+            fig = plt.subplots(figsize = (8,8))
+            sns.countplot(y = second_word_list, order = [i[0] for i in popular])#グラフ作成
+            filename = 'english/static/english/png/count.png'#フォルダ指定
+            plt.savefig(filename)
+    except:
+        params['msg'] = 'a,an,theのみ入力していませんか？'
     return render(request, 'english/count.html', params)
 
 def twitter(request, pk):
@@ -223,39 +238,42 @@ def twitter(request, pk):
     if (request.method == 'POST'):
         screen_name = request.POST['screen_name']
         try:
-            tweets = api.user_timeline(screen_name = screen_name, count = 14, tweet_mode = "extended")
-            word_list = []#単語の格納先
+            #指定したユーザーの最新ツイートを7個取得、tweet_modeは以降のfull...で必要
+            tweets = api.user_timeline(screen_name = screen_name, count = 7, tweet_mode = "extended")
+            word_list = []#単語の一時的な格納先
             for tweet in tweets:
                 params['a'] = tweet.user.screen_name
-                count = str(tweet.full_text.lower()).replace(",", "")
+                 #記号を削除する
+                count = str(tweet.full_text.lower()).replace(",", "")#full...をしなければ100文字制限が発生する
                 count = count.replace(".", "")
                 count = count.replace("!", "")
                 count = count.replace("?", "")
-                word = count.split()
+                word = count.split()#スペースで単語ごとに区切る
                 word_list.append(word)#リストaに格納
             change = itertools.chain.from_iterable(word_list)#一次元配列に変換
             words = list(change)#y軸に入れられるように統一
-            new_word_list = []
+            second_word_list = []#最終的なリスト先
             #以下、主語→動詞→前置詞→接続詞→冠詞→否定+省略語の順で汎用度の高い単語を記述
-            emit_words = ["i", "you", "we", "he", "she", "they", "it", "this", "that",\
-                        "am", "is", "are", "was", "were", "does", "did", "do",\
+            emit_words = [
+                        "i", "you", "we", "he", "she", "they", "it", "this", "that",\
+                        "be","am", "is", "are", "was", "were", "does", "did", "do",\
                         "at", "on", "in", "for", "to", "into", "of", "out", "as", "from", "with",\
                         "and", "or",\
                         "a", "an", "the",\
                         "not", "ain't", "aren't", "isn't", "wasn't", "weren't",\
                         "don't", "doesn't", "didn't", "haven't", "hasn't", "hadn't",\
-                        "i'm", "you're", "he's", "she's", "they're", "it's", "that's"]
+                        "i'm", "you're", "he's", "she's", "they're", "it's", "that's"
+                        ]
             for sort_word in words:
-                if (sort_word in emit_words) == False:
-                    new_word_list.append(sort_word)
-            collect = collections.Counter(new_word_list)#単語の数の計測
+                if (sort_word in emit_words) == False:#emit_wordsに記載の単語を排除
+                    second_word_list.append(sort_word)
+            collect = collections.Counter(second_word_list)#単語の数の計測
             popular = collect.most_common(20)#使用頻度上位20個抽出
             sns.set(context = "talk")#横棒グラフ
-            fig = plt.subplots(figsize = (12,12))
-            sns.countplot(y = new_word_list, order = [i[0] for i in popular])#グラフ作成
+            fig = plt.subplots(figsize = (13,13))#長い単語でも視認できる大きさに
+            sns.countplot(y = second_word_list, order = [i[0] for i in popular])#グラフ作成
             filename = 'english/static/english/png/count_twitter.png'#フォルダ指定
-            plt.savefig(filename)    
+            plt.savefig(filename)#上書き
         except:
             params['msg'] = 'このアカウントは存在しないかご利用いただけません'
     return render(request, 'english/twitter.html', params)
-

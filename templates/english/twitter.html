@@ -17,9 +17,11 @@
             <p>{{danger}}</p>
             <p>{{a}}</p>
             {{form.as_p}}
-            <p><input type = "submit" value ="click" class = "btn btn-dark btn-lg"></p>
+            <p><input type = "submit" value ="完了" class = "btn btn-dark btn-lg"></p>
             <p><a class = "btn btn-dark btn-lg" href = "{% url 'mypage' request.user.pk %}">戻る</a></p>
-            <p><img src= "{% static 'english/png/count_twitter.png' %}" width="500" height="500"></p>
+            {% if request.method == "POST" %}
+            <img class = "img-fluid" src= "{% static 'english/png/count_twitter.png' %}" width="500" height="500">
+            {% endif %}
     </form>
 </body>
 </html>
